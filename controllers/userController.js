@@ -734,16 +734,12 @@ const p2pOnwerResonse = async (req, res) => {
               amount: requesterFiatAmount,
             }
           );
-          console.log("buy 8");
           const originalRequest = await Request.findOne({
             _id: request.requestOf,
           });
           const lastAmount = originalRequest.amount - request.amount;
           // CHECK IF REQUESTER BUY ALL THE COIN, THE POST WILL BE DELETED.
           if (lastAmount <= 0) {
-            console.log("buy 9");
-            console.log("buy 7");
-
             await Request.findOneAndRemove({
               _id: request.requestOf,
             });
@@ -766,44 +762,6 @@ const p2pOnwerResonse = async (req, res) => {
               message: "Success!!",
             });
           }
-          console.log("buy 10");
-          console.log("buy 7");
-          // await Wallet.findOneAndUpdate(
-          //   {
-          //     _id: psOwnerFiatUnit.id,
-          //   },
-          //   {
-          //     amount:
-          //       psOwnerFiatUnit.amount -
-          //       (request.total / originalRequest.amount) * request.amount,
-          //   }
-          // );
-          // await Wallet.findOneAndUpdate(
-          //   {
-          //     _id: psOwnerCryptoUnit.id,
-          //   },
-          //   {
-          //     amount: psOwnerCryptoAmount,
-          //   }
-          // );
-          // await Wallet.findOneAndUpdate(
-          //   {
-          //     _id: requesterCryptoUnit.id,
-          //   },
-          //   {
-          //     amount: requesterCryptoAmount,
-          //   }
-          // );
-          // await Wallet.findOneAndUpdate(
-          //   {
-          //     _id: requesterFiatUnit.id,
-          //   },
-          //   {
-          //     amount:
-          //       requesterFiatUnit.amount -
-          //       (request.total / originalRequest.amount) * request.amount,
-          //   }
-          // );
           await Request.findOneAndUpdate(
             {
               _id: request.requestOf,
@@ -832,7 +790,6 @@ const p2pOnwerResonse = async (req, res) => {
             date: request.date,
           });
 
-          console.log("buy 11");
           return res.status(200).send({
             message: "Success!!",
           });
@@ -847,7 +804,6 @@ const p2pOnwerResonse = async (req, res) => {
       request.status === "approved"
     ) {
       /******************************************************************/
-      console.log("sell 1");
       const psOwnerFiatUnit = await Wallet.findOne({
         userID: request.userID,
         currencyID: request.secondUnit,
@@ -864,15 +820,9 @@ const p2pOnwerResonse = async (req, res) => {
         userID: requester.id,
         currencyID: request.firstUnit,
       });
-      console.log("psOwnerFiatUnit", psOwnerFiatUnit);
-      console.log("psOwnerCryptoUnit", psOwnerCryptoUnit);
-      console.log("requesterFiatUnit", requesterFiatUnit);
-      console.log("requesterCryptoUnit", requesterCryptoUnit);
-      console.log("sell 2");
       /******************************************************************/
       //INVALID UNIT
       if (!psOwnerCryptoUnit || !requesterFiatUnit) {
-        console.log("sell 3");
         await Request.findOneAndUpdate(
           {
             _id: req.body.requestID,
@@ -881,35 +831,27 @@ const p2pOnwerResonse = async (req, res) => {
             status: "pending",
           }
         );
-        console.log("sell 4");
         return res.status(401).send({
           message: "Invalid currency.",
         });
       } else if (psOwnerCryptoUnit && requesterFiatUnit) {
-        console.log("sell 5");
         if (!psOwnerFiatUnit || !requesterCryptoUnit) {
-          console.log("sell 6");
           if (!psOwnerFiatUnit) {
-            console.log("sell 7");
             await Wallet.create({
               userID: psOwner.id,
               currencyID: request.secondUnit,
               amount: 0,
               type: "Fiat Currencies",
             });
-            console.log("sell 7.1");
           } else if (!requesterCryptoUnit) {
-            console.log("sell 8");
             await Wallet.create({
               userID: requester.id,
               currencyID: request.firstUnit,
               amount: 0,
               type: "Cryptocurrencies",
             });
-            console.log("sell 8.1");
           }
         }
-        console.log("sell 9");
 
         const psOwnerFiatAmount =
           parseFloat(psOwnerFiatUnit.amount) + parseFloat(request.total);
@@ -920,13 +862,7 @@ const p2pOnwerResonse = async (req, res) => {
         const requesterCryptoAmount =
           parseFloat(requesterCryptoUnit.amount) + parseFloat(request.amount);
 
-        // console.log(psOwnerFiatAmount);
-        // console.log(psOwnerCryptoAmount);
-        // console.log(requesterFiatAmount);
-        // console.log(requesterCryptoAmount);
-        console.log("sell 9.1");
         if (psOwnerCryptoAmount < 0 || requesterFiatAmount < 0) {
-          console.log("sell 10");
           await Request.findOneAndUpdate(
             {
               _id: req.body.requestID,
@@ -935,12 +871,10 @@ const p2pOnwerResonse = async (req, res) => {
               status: "pending",
             }
           );
-          console.log("sell 10.1");
           return res.status(401).send({
             message: "Not enough amount.",
           });
         } else {
-          console.log("sell 11");
           await Wallet.findOneAndUpdate(
             {
               _id: psOwnerFiatUnit.id,
@@ -973,18 +907,13 @@ const p2pOnwerResonse = async (req, res) => {
               amount: requesterFiatAmount,
             }
           );
-          console.log("sell 11.1");
         }
-        console.log("sell 12");
         const originalRequest = await Request.findOne({
           _id: request.requestOf,
         });
-        console.log("sell 12.1");
         const lastAmount = originalRequest.amount - request.amount;
         // CHECK IF REQUESTER BUY ALL THE COIN, THE POST WILL BE DELETED.
-        console.log(lastAmount);
         if (lastAmount <= 0) {
-          console.log("sell 13");
           await Request.findOneAndRemove({
             _id: request.requestOf,
           });
@@ -1013,6 +942,9 @@ const p2pOnwerResonse = async (req, res) => {
           },
           {
             amount: lastAmount,
+            status: "pending",
+            total:
+              (originalRequest.total / originalRequest.amount) * lastAmount,
           }
         );
         await Transaction.create({
@@ -1030,7 +962,6 @@ const p2pOnwerResonse = async (req, res) => {
           requestBy: request.requestBy,
           date: request.date,
         });
-        console.log("sell 14");
         return res.status(200).send({
           message: "Success!!",
         });
