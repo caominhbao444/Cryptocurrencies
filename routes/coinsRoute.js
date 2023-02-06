@@ -24,7 +24,7 @@ const {
   marketsParser,
   TredingCoinsParser,
   getTransactions,
-} = require("../controllers/CoinsController");
+} = require("../controllers/coinsController");
 //------------------------
 //------------------------
 //Coins info
