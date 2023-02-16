@@ -280,21 +280,20 @@ const p2pRequest = async (req, res) => {
     // const user = await User.findOne({
     //   email: req.params.email,
     // });
+    console.log(user);
 
     if (!user) {
       return res.status(400).send({
         message: "Invalid link",
       });
     }
+    console.log(req.body);
 
     if (req.body.type === "buy") {
       const existWallet = await Wallet.findOne({
         userID: user.id,
         currencyID: req.body.secondUnit.toUpperCase(),
       });
-      // console.log(req.body.secondUnit.toUpperCase());
-      // console.log(user.id);
-      // console.log(existWallet);
 
       if (!existWallet) {
         return res.status(401).send({
@@ -315,7 +314,7 @@ const p2pRequest = async (req, res) => {
           total: req.body.total ? req.body.total : null,
           senderAddress: req.body.senderAddress
             ? encoded(req.body.senderAddress)
-            : null,
+            : encoded(user.email),
           recieverAddress: req.body.recieverAddress
             ? encoded(req.body.recieverAddress)
             : null,
@@ -356,7 +355,7 @@ const p2pRequest = async (req, res) => {
           total: req.body.total ? req.body.total : null,
           senderAddress: req.body.senderAddress
             ? encoded(req.body.senderAddress)
-            : null,
+            : encoded(user.email),
           recieverAddress: req.body.recieverAddress
             ? encoded(req.body.recieverAddress)
             : null,
