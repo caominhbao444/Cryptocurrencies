@@ -5,7 +5,7 @@ const connectDB = async () => {
   try {
     await mongoose.connect(process.env.MONGOURI, { useNewUrlParser: true });
   } catch (error) {
-    console.log(error);
+    //console.log(error);
   }
 };
 

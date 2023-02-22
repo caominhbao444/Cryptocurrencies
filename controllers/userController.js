@@ -13,6 +13,9 @@ const Wallet = require("../models/wallet");
 const Request = require("../models/request");
 const Transaction = require("../models/transaction");
 const Account = require("../models/account");
+const multer = require("multer");
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
 
 const encoded = (value) => {
   var encrypted = CryptoJS.AES.encrypt(value, process.env.HASH_SECRET_KEY);
@@ -50,7 +53,7 @@ const getUserInfo = async (req, res) => {
       stringdata,
       { type: "svg" },
       function (err, QRcode) {
-        if (err) return console.log("error occurred");
+        if (err) return; //console.log("error occurred");
       }
     );
 
@@ -87,6 +90,57 @@ const editUserInfo = async (req, res) => {
       return res.status(400).send({
         message: "Invalid link",
       });
+
+    res.status(200).send({
+      message: "Update user information successfully!!!",
+    });
+  } catch (err) {
+    res.status(500).send({
+      message: "Internal Server Error",
+    });
+  }
+};
+
+//upload avatar
+const uploadAvatar = async (req, res) => {
+  try {
+    const authHeader = req.headers["authorization"];
+    let user = await User.findOne({
+      email: verifyUser(authHeader),
+    });
+
+    if (!user) {
+      return res.status(400).send({
+        message: "Invalid link",
+      });
+    }
+
+    if (!req.file) {
+      return res.status(401).send({
+        message: "You must provide a file",
+      });
+    }
+
+    let imageUploadeObject = {
+      file: {
+        data: req.file.buffer,
+        contentType: req.file.mimetype,
+      },
+      fileName: req.body.fileName,
+    };
+
+    await User.findOneAndUpdate(
+      {
+        email: verifyUser(authHeader),
+      },
+      {
+        fileName: req.body.fileName,
+        file: {
+          data: req.file.buffer,
+          contentType: req.file.mimetype,
+        },
+      }
+    );
 
     res.status(200).send({
       message: "Update user information successfully!!!",
@@ -136,11 +190,9 @@ const request = async (req, res) => {
   try {
     const authHeader = req.headers["authorization"];
     //
-    console.log("hello");
     const user = await User.findOne({
       email: verifyUser(authHeader),
     });
-    console.log(verifyUser(authHeader));
 
     if (!user) {
       return res.status(400).send({
@@ -148,6 +200,11 @@ const request = async (req, res) => {
       });
     }
 
+    if (!req.body.firstUnit || !req.body.recieverAddress || !req.body.amount) {
+      return res.status(400).send({
+        message: "Please enter all information!!",
+      });
+    }
     if (req.params.type === "spot") {
       const existWallet = await Wallet.findOne({
         userID: user.id,
@@ -237,7 +294,7 @@ const requestInfo = async (req, res) => {
       });
     }
     const page = req.query.page;
-    console.log(page);
+    //console.log(page);
     let skip = 0;
     if (parseInt(page) <= 1 || !page) {
       skip = 0;
@@ -277,18 +334,12 @@ const p2pRequest = async (req, res) => {
     const user = await User.findOne({
       email: verifyUser(authHeader),
     });
-    // const user = await User.findOne({
-    //   email: req.params.email,
-    // });
-    console.log(user);
 
     if (!user) {
       return res.status(400).send({
         message: "Invalid link",
       });
     }
-    console.log(req.body);
-
     if (req.body.type === "buy") {
       const existWallet = await Wallet.findOne({
         userID: user.id,
@@ -333,7 +384,7 @@ const p2pRequest = async (req, res) => {
         userID: user._id,
         currencyID: req.body.firstUnit, // unit that in user wallet
       });
-      // console.log(existWallet);
+      // //console.log(existWallet);
 
       if (!existWallet) {
         return res.status(401).send({
@@ -436,7 +487,7 @@ const p2pClientRequest = async (req, res) => {
         userID: user._id,
         currencyID: req.body.secondUnit.toUpperCase(),
       });
-      console.log(existWallet);
+      //console.log(existWallet);
 
       if (!existWallet) {
         return res.status(401).send({
@@ -453,8 +504,8 @@ const p2pClientRequest = async (req, res) => {
       const publicRequest = await Request.findOne({
         _id: req.body.requestOf,
       });
-      console.log(req.body.requestOf);
-      console.log(publicRequest);
+      //console.log(req.body.requestOf);
+      //console.log(publicRequest);
       if (total > 0) {
         await Request.create({
           userID: publicRequest.userID,
@@ -504,8 +555,8 @@ const p2pClientRequest = async (req, res) => {
       const publicRequest = await Request.findOne({
         _id: req.body.requestOf,
       });
-      // console.log(req.body.requestOf);
-      // console.log(publicRequest);
+      // //console.log(req.body.requestOf);
+      // //console.log(publicRequest);
       if (total > 0) {
         await Request.create({
           userID: publicRequest.userID,
@@ -553,7 +604,7 @@ const p2pOnwerResonse = async (req, res) => {
     //   email: req.params.email,
     // });
 
-    console.log("1");
+    //console.log("1");
     //CHECK VALID OWNER
     if (!psOwner) {
       return res.status(400).send({
@@ -575,9 +626,9 @@ const p2pOnwerResonse = async (req, res) => {
       _id: req.body.requestID,
     });
 
-    console.log("2");
+    //console.log("2");
     const requesterEmail = decoded(request.senderAddress);
-    console.log("2.1");
+    //console.log("2.1");
     //CHECK VALID CLIENT
     const requester = await User.findOne({
       email: requesterEmail,
@@ -589,16 +640,16 @@ const p2pOnwerResonse = async (req, res) => {
       });
     }
     //
-    console.log(requester);
-    console.log(requester.id);
-    console.log("4");
+    //console.log(requester);
+    //console.log(requester.id);
+    //console.log("4");
     if (
       request.requestType === "p2pReq" &&
       request.type === "buy" &&
       request.status === "approved"
     ) {
       /******************************************************************/
-      console.log("buy 001");
+      //console.log("buy 001");
       const psOwnerFiatUnit = await Wallet.findOne({
         userID: request.userID,
         currencyID: request.secondUnit,
@@ -615,16 +666,16 @@ const p2pOnwerResonse = async (req, res) => {
         userID: requester.id,
         currencyID: request.firstUnit,
       });
-      console.log("buy 002");
-      console.log("psOwnerFiatUnit", psOwnerFiatUnit);
-      console.log("psOwnerCryptoUnit", psOwnerCryptoUnit);
-      console.log("requesterFiatUnit", requesterFiatUnit);
-      console.log("requesterCryptoUnit", requesterCryptoUnit);
+      //console.log("buy 002");
+      //console.log("psOwnerFiatUnit", psOwnerFiatUnit);
+      //console.log("psOwnerCryptoUnit", psOwnerCryptoUnit);
+      //console.log("requesterFiatUnit", requesterFiatUnit);
+      //console.log("requesterCryptoUnit", requesterCryptoUnit);
       /******************************************************************/
-      console.log("buy 003");
+      //console.log("buy 003");
       //INVALID UNIT
       if (!psOwnerFiatUnit || !requesterCryptoUnit) {
-        console.log("buy 1");
+        //console.log("buy 1");
         await Request.findOneAndUpdate(
           {
             _id: req.body.requestID,
@@ -637,32 +688,32 @@ const p2pOnwerResonse = async (req, res) => {
           message: "Invalid currency.",
         });
       } else if (psOwnerFiatUnit && requesterCryptoUnit) {
-        console.log("buy 2.2");
+        //console.log("buy 2.2");
         if (!psOwnerCryptoUnit || !requesterFiatUnit) {
-          console.log("buy 2");
+          //console.log("buy 2");
           if (!psOwnerCryptoUnit) {
-            console.log("buy 3");
+            //console.log("buy 3");
             await Wallet.create({
               userID: psOwner.id,
               currencyID: request.firstUnit,
               amount: 0,
               type: "Cryptocurrencies",
             });
-            console.log("buy 3.1");
+            //console.log("buy 3.1");
           } else if (!requesterFiatUnit) {
-            console.log("buy 4");
-            console.log(requester);
-            console.log(request);
+            //console.log("buy 4");
+            //console.log(requester);
+            //console.log(request);
             await Wallet.create({
               userID: requester.id,
               currencyID: request.secondUnit,
               amount: 0,
               type: "Fiat Currencies",
             });
-            console.log("buy 4.1");
+            //console.log("buy 4.1");
           }
         }
-        console.log("buy 5");
+        //console.log("buy 5");
         // const asyncFunction = async () => {
         const psOwnerFiatAmount =
           (await parseFloat(psOwnerFiatUnit.amount)) -
@@ -679,13 +730,13 @@ const p2pOnwerResonse = async (req, res) => {
         // };
         // asyncFunction();
 
-        console.log(psOwnerFiatAmount);
-        console.log(psOwnerCryptoAmount);
-        console.log(requesterFiatAmount);
-        console.log(requesterCryptoAmount);
-        console.log("buy 5.1");
+        //console.log(psOwnerFiatAmount);
+        //console.log(psOwnerCryptoAmount);
+        //console.log(requesterFiatAmount);
+        //console.log(requesterCryptoAmount);
+        //console.log("buy 5.1");
         if (psOwnerFiatAmount < 0 || requesterCryptoAmount < 0) {
-          console.log("buy 6");
+          //console.log("buy 6");
           await Request.findOneAndUpdate(
             {
               _id: req.body.requestID,
@@ -694,12 +745,12 @@ const p2pOnwerResonse = async (req, res) => {
               status: "pending",
             }
           );
-          console.log("buy 6.1");
+          //console.log("buy 6.1");
           return res.status(401).send({
             message: "Not enough amount.",
           });
         } else {
-          console.log("buy 7.1");
+          //console.log("buy 7.1");
           //
           await Wallet.findOneAndUpdate(
             {
@@ -1063,7 +1114,7 @@ const getApprovedRequest = async (req, res) => {
       }
     });
 
-    // console.log(request);
+    // //console.log(request);
 
     ownerRequest.forEach((obj) => {
       if (obj.type === "sell") {
@@ -1087,6 +1138,7 @@ const getApprovedRequest = async (req, res) => {
 module.exports = {
   getUserInfo,
   editUserInfo,
+  uploadAvatar,
   //wallet
   getWallet,
   //

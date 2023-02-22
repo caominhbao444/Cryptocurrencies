@@ -5,7 +5,7 @@ const verifyUser = (headers) => {
   const authHeader = headers;
   if (!authHeader?.startsWith("Bearer ")) {
     return {
-      message: "A token is require for authentication!!",
+      message: "A token is require for authentication!!!",
     };
   }
   // 'Beaer [token]'

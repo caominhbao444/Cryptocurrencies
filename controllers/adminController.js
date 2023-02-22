@@ -125,6 +125,7 @@ const responseFunding = async (req, res) => {
         message: "Invalid link",
       });
     }
+    //console.log("dad", req.body);
 
     if (!req.body.requestID || !req.body.status) {
       return res.status(401).send({
@@ -286,7 +287,7 @@ const responseSpot = async (req, res) => {
         }
 
         if (!wallet) {
-          console.log("hello5");
+          //console.log("hello5");
 
           let name =
             request.firstUnit.charAt(0).toUpperCase() +
@@ -294,9 +295,9 @@ const responseSpot = async (req, res) => {
           const currency = await Currency.findOne({
             name: name,
           });
-          console.log(currency);
-          console.log(request.firstUnit);
-          console.log(name);
+          //console.log(currency);
+          //console.log(request.firstUnit);
+          //console.log(name);
           if (currency) {
             if (
               currency.category === "Suggested Currencies" ||
@@ -313,7 +314,7 @@ const responseSpot = async (req, res) => {
               type: type,
             });
 
-            console.log("hello7");
+            //console.log("hello7");
 
             return res.status(200).send({
               message: "Success!!",
@@ -330,7 +331,7 @@ const responseSpot = async (req, res) => {
             type: type,
           });
 
-          console.log("hello7");
+          //console.log("hello7");
 
           return res.status(200).send({
             message: "Success!!",
@@ -340,13 +341,13 @@ const responseSpot = async (req, res) => {
       }
 
       if (!existsWallet) {
-        console.log("hello8");
+        //console.log("hello8");
         return res.status(401).send({
           message: "Not enough amount",
         });
       }
     }
-    
+
     return res.status(200).send({
       message: "Rejected!!",
     });
@@ -373,7 +374,7 @@ const requestInfo = async (req, res) => {
       });
     }
     const page = req.query.page;
-    console.log(page);
+    //console.log(page);
     let skip = 0;
     if (parseInt(page) <= 1 || !page) {
       skip = 0;

@@ -19,11 +19,11 @@ const getCoinInfo = async (vs_currency, ids) => {
         return response;
       })
       .catch((err) => {
-        console.log(err);
+        //console.log(err);
       });
     return res.data;
   } catch (err) {
-    console.log(err);
+    //console.log(err);
   }
 };
 const coinParser = async (req, res) => {
@@ -43,11 +43,11 @@ const getCoinInfoDetails = async (ids) => {
         return response;
       })
       .catch((err) => {
-        console.log(err);
+        //console.log(err);
       });
     return res.data;
   } catch (err) {
-    console.log(err);
+    //console.log(err);
   }
 };
 const coinDetailsParse = async (req, res) => {
@@ -67,11 +67,11 @@ const getCategories = async () => {
         return response;
       })
       .catch((err) => {
-        console.log(err);
+        //console.log(err);
       });
     return res.data;
   } catch (err) {
-    console.log(err);
+    //console.log(err);
   }
 };
 
@@ -89,11 +89,11 @@ const getderivativesInfo = async (perPage, page) => {
         return response;
       })
       .catch((err) => {
-        console.log(err);
+        //console.log(err);
       });
     return res.data;
   } catch (err) {
-    console.log(err);
+    //console.log(err);
   }
 };
 const derivativesParse = async (req, res) => {
@@ -115,11 +115,11 @@ const getExchangesInfo = async (perPage, page) => {
         return response;
       })
       .catch((err) => {
-        console.log(err);
+        //console.log(err);
       });
     return res.data;
   } catch (err) {
-    console.log(err);
+    //console.log(err);
   }
 };
 const ExchangesParse = async (req, res) => {
@@ -150,7 +150,7 @@ const getCoinImage = async (req, res) => {
 
 const getAllCoinImage = async (req, res) => {
   const page = req.query.page;
-  console.log(page);
+  //console.log(page);
   let skip = 0;
   if (parseInt(page) <= 1 || !page) {
     skip = 0;
@@ -246,7 +246,7 @@ const updateCoinImage = async (req, res) => {
 
 const searchCoinsImage = async (req, res) => {
   const wordEntered = req.query.wordEntered;
-  console.log(wordEntered);
+  //console.log(wordEntered);
 
   const cursor = await Coins.find({
     symbol: wordEntered,
@@ -257,7 +257,7 @@ const searchCoinsImage = async (req, res) => {
       message: "Not found",
     });
   }
-  console.log(cursor);
+  //console.log(cursor);
 
   return res.status(200).send({
     cursor,
@@ -375,7 +375,7 @@ const getByCategory = async (req, res) => {
 //       return response;
 //     })
 //     .catch((err) => {
-//       console.log(err);
+//       //console.log(err);
 //     });
 
 //   return res.data;
@@ -400,7 +400,7 @@ const getHistoryChartInfo = async (coinID, days) => {
       return response;
     })
     .catch((err) => {
-      console.log(err);
+      //console.log(err);
     });
 
   return res.data;
@@ -428,7 +428,7 @@ const getMarkets = async (vs_currency, category, order, perPage, page) => {
       return response;
     })
     .catch((err) => {
-      console.log(err);
+      //console.log(err);
     });
   return res.data;
 };
@@ -439,7 +439,7 @@ const getMarketsAll = async (vs_currency, order, perPage, page) => {
       return response;
     })
     .catch((err) => {
-      console.log(err);
+      //console.log(err);
     });
   return res.data;
 };
@@ -487,11 +487,11 @@ const getTrendingCoins = async () => {
         return response;
       })
       .catch((err) => {
-        console.log(err);
+        //console.log(err);
       });
     return res.data;
   } catch (err) {
-    console.log(err);
+    //console.log(err);
   }
 };
 const TredingCoinsParser = async (req, res) => {

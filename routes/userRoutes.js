@@ -4,6 +4,7 @@ const router = express.Router();
 const {
   getUserInfo,
   editUserInfo,
+  uploadAvatar,
   getWallet,
   request,
   requestInfo,
@@ -20,6 +21,9 @@ router.get("/user-info/review", getUserInfo);
 
 //update user
 router.patch("/user-info/update", editUserInfo);
+
+//upload avatar
+router.post("/user-info/update", uploadAvatar);
 
 //
 router.get("/wallet/review", getWallet);
