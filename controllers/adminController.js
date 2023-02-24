@@ -41,9 +41,6 @@ const editUser = async (req, res) => {
     const user = await User.findOne({
       email: verifyUser(authHeader),
     });
-    // const user = await User.findOne({
-    //   email: req.params.email,
-    // });
 
     if (!user || user.role !== "admin") {
       return res.status(400).send({
@@ -83,16 +80,12 @@ const deleteUser = async (req, res) => {
     const user = await User.findOne({
       email: verifyUser(authHeader),
     });
-    // const user = await User.findOne({
-    //   email: req.params.email,
-    // });
 
     if (!user || user.role !== "admin") {
       return res.status(400).send({
         message: "Invalid link",
       });
     }
-
     await User.findOneAndDelete({
       email: req.body.email,
     });

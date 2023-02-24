@@ -16,16 +16,8 @@ const UserSchema = new Schema(
       type: String,
       default: "member",
     },
-    fileName: {
+    image: {
       type: String,
-    },
-    file: {
-      data: Buffer,
-      contentType: String,
-    },
-    uploadTime: {
-      type: Date,
-      default: Date.now(),
     },
   },
   { timestamps: true }

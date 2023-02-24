@@ -57,7 +57,9 @@ const signup = async (req, res) => {
     });
 
     const url = `${process.env.BASE_URL}api/auth/verify/${newAccount.id}/${token.token}`;
-    await sendEmail(newAccount.email, "Verify Email", url);
+    const msg = `<p>Vui lòng click vào link để hoàn thành đăng ký tài khoản: <a href="${url}">Verify Account</a> </p>`;
+
+    await sendEmail(newAccount.email, "Verify Email", msg);
     res.status(201).send({
       message: "An Email sent to your account please verify",
     });
@@ -198,7 +200,9 @@ const forgotPassword = async (req, res) => {
     if (!user) return res.status(409).send({ message: "User Not Exist!" });
 
     const url = `${process.env.BASE_URL}api/auth/reset-password/${user.email}`;
-    await sendEmail(user.email, "Password Reset", url);
+    const msg = `<p>Vui lòng click vào link để hoàn thành thay đổi password: <a href="${url}">Reset Password</a> </p>`;
+
+    await sendEmail(user.email, "Password Reset", msg);
 
     res
       .status(201)

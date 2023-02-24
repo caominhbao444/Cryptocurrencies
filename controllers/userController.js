@@ -83,6 +83,7 @@ const editUserInfo = async (req, res) => {
       },
       {
         fullname: req.body.fullname,
+        image: req.body.image,
       }
     );
 
@@ -90,57 +91,6 @@ const editUserInfo = async (req, res) => {
       return res.status(400).send({
         message: "Invalid link",
       });
-
-    res.status(200).send({
-      message: "Update user information successfully!!!",
-    });
-  } catch (err) {
-    res.status(500).send({
-      message: "Internal Server Error",
-    });
-  }
-};
-
-//upload avatar
-const uploadAvatar = async (req, res) => {
-  try {
-    const authHeader = req.headers["authorization"];
-    let user = await User.findOne({
-      email: verifyUser(authHeader),
-    });
-
-    if (!user) {
-      return res.status(400).send({
-        message: "Invalid link",
-      });
-    }
-
-    if (!req.file) {
-      return res.status(401).send({
-        message: "You must provide a file",
-      });
-    }
-
-    let imageUploadeObject = {
-      file: {
-        data: req.file.buffer,
-        contentType: req.file.mimetype,
-      },
-      fileName: req.body.fileName,
-    };
-
-    await User.findOneAndUpdate(
-      {
-        email: verifyUser(authHeader),
-      },
-      {
-        fileName: req.body.fileName,
-        file: {
-          data: req.file.buffer,
-          contentType: req.file.mimetype,
-        },
-      }
-    );
 
     res.status(200).send({
       message: "Update user information successfully!!!",
@@ -435,9 +385,7 @@ const p2pRequestInfo = async (req, res) => {
     const user = await User.findOne({
       email: verifyUser(authHeader),
     });
-    // const user = await User.findOne({
-    //   email: req.params.email,
-    // });
+
     if (!user) {
       return res.status(400).send({
         message: "Invalid link",
@@ -446,9 +394,10 @@ const p2pRequestInfo = async (req, res) => {
 
     if (req.params.type === "own") {
       const request = await Request.find({
-        userID: user.id,
+        userID: user._id,
         requestType: "p2pReq",
       });
+      console.log(request);
 
       return res.status(200).send({
         request,
@@ -1138,7 +1087,6 @@ const getApprovedRequest = async (req, res) => {
 module.exports = {
   getUserInfo,
   editUserInfo,
-  uploadAvatar,
   //wallet
   getWallet,
   //
