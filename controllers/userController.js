@@ -13,9 +13,6 @@ const Wallet = require("../models/wallet");
 const Request = require("../models/request");
 const Transaction = require("../models/transaction");
 const Account = require("../models/account");
-const multer = require("multer");
-const storage = multer.memoryStorage();
-const upload = multer({ storage: storage });
 
 const encoded = (value) => {
   var encrypted = CryptoJS.AES.encrypt(value, process.env.HASH_SECRET_KEY);
